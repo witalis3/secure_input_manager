@@ -14,6 +14,13 @@
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
+  *
+  * ToDo
+  * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
+  * - sprawdzić rolę Timer2 - czy jest potrzebny
+  * - nastąpiła zmiana opisów kolumn KeyPada
+  *
+  ******************************************************************************
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -26,6 +33,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ssd1306.h"
 
 /* USER CODE END Includes */
 
