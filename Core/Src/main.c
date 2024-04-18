@@ -18,7 +18,8 @@
   * ToDo
   * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
   * 	- zrobiony! OLED
-  * 	- KeyPad
+  * 	- zrobiony! KeyPad
+  * 	-
   * - sprawdzić rolę Timer2 - czy jest potrzebny
   * - nastąpiła zmiana opisów kolumn KeyPada
   *
@@ -35,7 +36,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+// OLED
 #include "ssd1306.h"
+// KeyPad
+#include "KeyPad.h"
+// keyboard
+#include "keyboard.h"
+#include "queue.h"
+
 
 /* USER CODE END Includes */
 
@@ -92,6 +100,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	// KeyPad begin
+	KeyPad_Init();
+	// KeyPad end
 
   /* USER CODE END 1 */
 
@@ -136,6 +147,20 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  // KeyPad begin
+		 uint32_t timeout = 20;
+		 char znak = KeyPad_WaitForKeyGetChar(timeout);
+		 if (znak != 'X')
+		 {
+			  	ssd1306_Init();
+			    ssd1306_Fill(Black);
+			    ssd1306_SetCursor(0,26);
+			    //char c = znak;
+			    char str1[2] = {znak , '\0'};
+				ssd1306_WriteString(str1, Font_11x18, White);
+				ssd1306_UpdateScreen();
+		 }
+		 // KeyPad end
   }
   /* USER CODE END 3 */
 }
