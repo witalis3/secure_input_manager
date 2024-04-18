@@ -19,7 +19,9 @@
   * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
   * 	- zrobiony! OLED
   * 	- zrobiony! KeyPad
-  * 	-
+  * 	- PS2
+  * 		- branch PS2; na bazie https://github.com/RobertoBenjami/stm32_ps2
+  * 		- prawie zrobiona c.d.n.
   * - sprawdzić rolę Timer2 - czy jest potrzebny
   * - nastąpiła zmiana opisów kolumn KeyPada
   *
@@ -40,9 +42,11 @@
 #include "ssd1306.h"
 // KeyPad
 #include "KeyPad.h"
-// keyboard
-#include "keyboard.h"
-#include "queue.h"
+// keyboard PS2
+#include "keyboardPS2.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 
 /* USER CODE END Includes */
@@ -98,7 +102,6 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 	// KeyPad begin
 	KeyPad_Init();
@@ -141,9 +144,30 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	// keybord PS2 begin
+	uint8_t ch;
+	printf("\r\nControl start\r\n");
+	// keyboard PS2 end
 
   while (1)
   {
+	// keybord PS2 begin
+	/* here we simulate the time of other activities in the program loop */
+	HAL_Delay(30);
+
+	/* get keyboard */
+	while(ps2_kbd_getkey(&ch) == 1)
+	{ /* recevied keyboard data */
+	  if(ch >= 32)
+		printf("Kbd: '%c', 0x%X\r\n", ch, ch);
+	  else
+		printf("Kbd:       0x%X\r\n", ch);
+	  ssd1306_WriteChar(ch, Font_11x18, White);
+		ssd1306_UpdateScreen();
+
+	}
+	// keyboard PS2 end
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
