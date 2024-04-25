@@ -19,9 +19,10 @@
   * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
   * 	- zrobiony! OLED
   * 	- zrobiony! KeyPad
+  * 	- zrobiony! RS232 huart2
   * 	- PS2
   * 		- branch PS2; na bazie https://github.com/RobertoBenjami/stm32_ps2
-  * 		- prawie zrobiona c.d.n.
+  * 		- usunięcie obsługi myszy
   * - sprawdzić rolę Timer2 - czy jest potrzebny
   * - nastąpiła zmiana opisów kolumn KeyPada
   *
@@ -146,9 +147,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	// keybord PS2 begin
 	uint8_t ch;
+	//ToDo nie działa printf wzięty z biblioteki PS2
 	printf("\r\nControl start\r\n");
 	// keyboard PS2 end
-
+	// RS send begin
+	const char message[] = "Keyboard started!\r\n";
+	HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+	// RS send end
   while (1)
   {
 	// keybord PS2 begin
@@ -158,11 +163,16 @@ int main(void)
 	/* get keyboard */
 	while(ps2_kbd_getkey(&ch) == 1)
 	{ /* recevied keyboard data */
+		/*
 	  if(ch >= 32)
 		printf("Kbd: '%c', 0x%X\r\n", ch, ch);
 	  else
 		printf("Kbd:       0x%X\r\n", ch);
-	  ssd1306_WriteChar(ch, Font_11x18, White);
+		*/
+		ssd1306_Init();
+		ssd1306_Fill(Black);
+		ssd1306_SetCursor(0,26);
+		ssd1306_WriteChar(ch, Font_11x18, White);
 		ssd1306_UpdateScreen();
 
 	}
@@ -183,6 +193,7 @@ int main(void)
 			    char str1[2] = {znak , '\0'};
 				ssd1306_WriteString(str1, Font_11x18, White);
 				ssd1306_UpdateScreen();
+
 		 }
 		 // KeyPad end
   }
