@@ -23,6 +23,8 @@
   * 	- PS2
   * 		- branch PS2; na bazie https://github.com/RobertoBenjami/stm32_ps2
   * 		- usunięcie obsługi myszy
+  * 	- USB keyboard
+  * 		- custom HID
   * - sprawdzić rolę Timer2 - czy jest potrzebny
   * - nastąpiła zmiana opisów kolumn KeyPada
   *
@@ -35,6 +37,7 @@
 #include "i2c.h"
 #include "spi.h"
 #include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -103,6 +106,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	// KeyPad begin
 	KeyPad_Init();
@@ -128,6 +132,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USB_DEVICE_Init();
   MX_I2C1_Init();
   MX_SPI3_Init();
   MX_USART2_UART_Init();

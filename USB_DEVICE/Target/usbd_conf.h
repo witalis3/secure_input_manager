@@ -75,7 +75,18 @@
 /*---------- -----------*/
 #define USBD_SELF_POWERED     1U
 /*---------- -----------*/
-#define MSC_MEDIA_PACKET     4096U
+#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     2U
+/*---------- -----------*/
+#define USBD_CUSTOM_HID_REPORT_DESC_SIZE     2U
+/*---------- -----------*/
+#define CUSTOM_HID_FS_BINTERVAL     0x5U
+/*---------- -----------*/
+/*---------- -----------*/
+
+/* #define USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
+/* #define USBD_CUSTOMHID_OUT_PREPARE_RECEIVE_DISABLED */
+/* #define USBD_CUSTOMHID_EP0_OUT_PREPARE_RECEIVE_DISABLED */
+/* #define USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
 
 /****************************************/
 /* #define for FS and HS identification */
