@@ -25,7 +25,10 @@
   * 		- usunięcie obsługi myszy
   * 	- USB keyboard
   * 		- custom HID
+  * 			- report...kbd_report
+  * 			- port i pin LED
   * - sprawdzić rolę Timer2 - czy jest potrzebny
+  * - sprawdzić, czy jest IP DMA (ustawienia USB OTG w MX)potrzebne
   * - nastąpiła zmiana opisów kolumn KeyPada
   *
   ******************************************************************************
@@ -97,7 +100,51 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define KEY_MOD_LCTRL  	0x01
+#define KEY_MOD_LSHIFT 	0x02
+#define KEY_MOD_LALT   	0x04
+#define KEY_MOD_LMETA  	0x08
+#define KEY_MOD_RCTRL  	0x10
+#define KEY_MOD_RSHIFT 	0x20
+#define KEY_MOD_RALT   	0x40
+#define KEY_MOD_RMETA  	0x80
+#define KEY_CAPSLOCK 	0x39
+#define KEY_LET(v)		(v - 'A' + 4) // A key - code 4
 
+// ToDo poprawić
+#define BTN_DOWN 1
+
+struct kbd_report {
+    uint8_t modifier;
+    uint8_t reserved;
+    uint8_t key[6];
+};
+void HAL_SYSTICK_Callback(void)
+{
+    static const struct kbd_report kreps[5] =
+    {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
+        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
+        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
+    };
+    static uint8_t phase = 5;
+    static uint8_t khist;
+    static uint8_t tdiv;
+    ++ tdiv;
+    //if (tdiv % 10 == 0 && phase == 5 && (khist = (khist << 1 | BTN_DOWN) & 3) == 1))
+    if (true)
+        {
+            phase = 0;
+        }
+        if (tdiv == 100)
+        {
+            tdiv = 0;
+            USBD_CUSTOM_HID_SendReport_FS((uint8_t*)&kreps[phase], sizeof(struct kbd_report));
+            if (phase < 5) ++phase;
+        }
+    }
 /* USER CODE END 0 */
 
 /**

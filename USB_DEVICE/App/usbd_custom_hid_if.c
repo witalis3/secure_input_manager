@@ -49,6 +49,9 @@
   */
 
 /* USER CODE BEGIN PRIVATE_TYPES */
+// ToDo poprawić
+#define LED_MSK 2
+#define LED_PORT 3
 
 /* USER CODE END PRIVATE_TYPES */
 
@@ -91,7 +94,38 @@
 __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
   /* USER CODE BEGIN 0 */
-  0x00,
+	    0x05, 0x01, //USAGE_PAGE (Generic Desktop)
+	    0x09, 0x06, //USAGE (Keyboard)
+	    0xa1, 0x01, //COLLECTION (Application)
+	    0x05, 0x07, //USAGE_PAGE (Keyboard)
+	    0x19, 0xe0, //USAGE_MINIMUM (Keyboard LeftControl)
+	    0x29, 0xe7, //USAGE_MAXIMUM (Keyboard Right GUI)
+	    0x15, 0x00, //LOGICAL_MINIMUM (0)
+	    0x25, 0x01, //LOGICAL_MAXIMUM (1)
+	    0x95, 0x08, //REPORT_COUNT (8)
+	    0x75, 0x01, //REPORT_SIZE (1)
+	    0x81, 0x02, //INPUT (Data,Var,Abs)
+	    0x95, 0x01, //REPORT_COUNT (1)
+	    0x75, 0x08, //REPORT_SIZE (8)
+	    0x81, 0x01, //INPUT (Cnst,Ary,Abs)
+	    0x19, 0x00, //USAGE_MINIMUM (Reserved (no event indicated))
+	    0x29, 0x65, //USAGE_MAXIMUM (Keyboard Application)
+	    0x15, 0x00, //LOGICAL_MINIMUM (0)
+	    0x25, 0x65, //LOGICAL_MAXIMUM (101)
+	    0x95, 0x06, //REPORT_COUNT (6)
+	    0x75, 0x08, //REPORT_SIZE (8)
+	    0x81, 0x00, //INPUT (Data,Ary,Abs)
+	    0x05, 0x08, //USAGE_PAGE (LEDs)
+	    0x19, 0x01, //USAGE_MINIMUM (Num Lock)
+	    0x29, 0x05, //USAGE_MAXIMUM (Kana)
+	    0x95, 0x05, //REPORT_COUNT (5)
+	    0x75, 0x01, //REPORT_SIZE (1)
+	    0x91, 0x02, //OUTPUT (Data,Var,Abs)
+	    0x95, 0x01, //REPORT_COUNT (1)
+	    0x75, 0x03, //REPORT_SIZE (3)
+	    0x91, 0x01, //OUTPUT (Cnst,Ary,Abs)
+	    //0xc0
+	    // END_COLLECTION
   /* USER CODE END 0 */
   0xC0    /*     END_COLLECTION	             */
 };
@@ -176,16 +210,22 @@ static int8_t CUSTOM_HID_DeInit_FS(void)
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN 6 */
+	if (event_idx & 2) LED_PORT->BSRR = LED_MSK;
+	    else LED_PORT->BRR = LED_MSK;
+	    return 0;
+/*
   UNUSED(event_idx);
   UNUSED(state);
 
-  /* Start next USB packet transfer once data processing is completed */
+   //Start next USB packet transfer once data processing is completed
   if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceFS) != (uint8_t)USBD_OK)
   {
     return -1;
   }
 
   return (USBD_OK);
+*/
+
   /* USER CODE END 6 */
 }
 
@@ -196,12 +236,12 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
   * @param  len: The report length
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-/*
+
 static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
 {
   return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
 }
-*/
+
 /* USER CODE END 7 */
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
