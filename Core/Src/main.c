@@ -16,7 +16,15 @@
   ******************************************************************************
   *
   * ToDo
+  * - jak wysłać raport na HID klawiatury?
+  * 	- extern device w main -> działa 2 wariant raportu (bez FS)
+  * 	- extern bez static w ...
   * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
+  * 	- w systick Callback
+  * 		- uruchomić debugger: czy wchodzi w systick callback?
+  * 		- czy jest obsługa uzsart?
+  * 		- wysyłać ew zmianę na PINie
+  *
   * 	- zrobiony! OLED
   * 	- zrobiony! KeyPad
   * 	- zrobiony! RS232 huart2
@@ -54,7 +62,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+// custom HID keyboard
+#include "usbd_customhid.h"
+#include "usbd_custom_hid_if.h"
 
 /* USER CODE END Includes */
 
@@ -89,7 +99,8 @@ char uartBuffer[BUFFERSIZE] = "";
 uint8_t I2CBuffer[I2CBUF] = {0};
 HAL_StatusTypeDef returnValue = 0;
 // OLED end
-
+// HID:
+extern USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -119,32 +130,9 @@ struct kbd_report {
     uint8_t reserved;
     uint8_t key[6];
 };
-void HAL_SYSTICK_Callback(void)
-{
-    static const struct kbd_report kreps[5] =
-    {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
-        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
-        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
-        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
-    };
-    static uint8_t phase = 5;
-    static uint8_t khist;
-    static uint8_t tdiv;
-    ++ tdiv;
-    //if (tdiv % 10 == 0 && phase == 5 && (khist = (khist << 1 | BTN_DOWN) & 3) == 1))
-    if (true)
-        {
-            phase = 0;
-        }
-        if (tdiv == 100)
-        {
-            tdiv = 0;
-            USBD_CUSTOM_HID_SendReport_FS((uint8_t*)&kreps[phase], sizeof(struct kbd_report));
-            if (phase < 5) ++phase;
-        }
-    }
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -155,6 +143,13 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	// test HID
+	uint8_t i;
+	uint8_t hid_test[64];
+	for (i = 0; i<64; i++)
+	{
+		hid_test[i] = i;
+	}
 	// KeyPad begin
 	KeyPad_Init();
 	// KeyPad end
@@ -212,6 +207,10 @@ int main(void)
 	/* here we simulate the time of other activities in the program loop */
 	HAL_Delay(30);
 
+	// HID test
+	HAL_Delay(1000);
+	USBD_CUSTOM_HID_SendReport_FS(hid_test, 64);
+
 	/* get keyboard */
 	while(ps2_kbd_getkey(&ch) == 1)
 	{ /* recevied keyboard data */
@@ -248,6 +247,49 @@ int main(void)
 
 		 }
 		 // KeyPad end
+		 // baba:
+		    static const struct kbd_report kreps[5] =
+		    {
+		        {0, 0, 0, 0, 0, 0, 0, 0},
+		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+		        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
+		        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
+		        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
+		    };
+		    static uint8_t phase = 5;
+		    static uint8_t khist;
+		    static uint8_t tdiv;
+		    ++ tdiv;
+		    if ( (tdiv % 10 == 0) && (phase == 5) && ((khist = (khist << 1 | BTN_DOWN) & 3) == 1) )
+			{
+				phase = 0;
+			}
+			if (tdiv == 100)
+			{
+
+				tdiv = 0;
+				USBD_CUSTOM_HID_SendReport_FS((uint8_t*)&kreps[phase], sizeof(struct kbd_report));
+				//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&kreps[phase], sizeof(struct kbd_report));
+				// RS send begin
+
+				const char message[] = "raport sent\r\n";
+				HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+
+				// RS send end
+				if (phase < 5)
+				{
+					++phase;
+				}
+			}
+			else
+			{
+				// RS send begin
+				const char message[] = "raport not sent\r\n";
+				HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+				// RS send end
+			}
+			// end baba
+		 //HAL_Delay(1);
   }
   /* USER CODE END 3 */
 }
@@ -332,6 +374,50 @@ void Error_Handler(void)
   {
   }
   /* USER CODE END Error_Handler_Debug */
+}
+void baba(void)
+{
+    static const struct kbd_report kreps[5] =
+    {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
+        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
+        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
+    };
+    static uint8_t phase = 5;
+    static uint8_t khist;
+    static uint8_t tdiv;
+    ++ tdiv;
+    if ( (tdiv % 10 == 0) && (phase == 5) && ((khist = (khist << 1 | BTN_DOWN) & 3) == 1) )
+	{
+		phase = 0;
+	}
+	if (tdiv == 100)
+	{
+
+		tdiv = 0;
+		USBD_CUSTOM_HID_SendReport_FS((uint8_t*)&kreps[phase], sizeof(struct kbd_report));
+		//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&kreps[phase], sizeof(struct kbd_report));
+		//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, uartBuffer, 4);
+		// RS send begin
+
+		const char message[] = "raport sent\r\n";
+		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+
+		// RS send end
+		if (phase < 5)
+		{
+			++phase;
+		}
+	}
+	else
+	{
+		// RS send begin
+		const char message[] = "raport not sent\r\n";
+		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+		// RS send end
+	}
 }
 
 #ifdef  USE_FULL_ASSERT

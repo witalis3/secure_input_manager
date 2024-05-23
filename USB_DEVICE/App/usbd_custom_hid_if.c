@@ -210,8 +210,10 @@ static int8_t CUSTOM_HID_DeInit_FS(void)
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN 6 */
+	/* ToDo obsługa LED
 	if (event_idx & 2) LED_PORT->BSRR = LED_MSK;
 	    else LED_PORT->BRR = LED_MSK;
+	    */
 	    return 0;
 /*
   UNUSED(event_idx);
@@ -237,7 +239,7 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
 
-static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
+int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
 {
   return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
 }
