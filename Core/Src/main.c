@@ -252,8 +252,12 @@ int main(void)
 		    {
 		        {0, 0, 0, 0, 0, 0, 0, 0},
 		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+				/*
 		        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
 		        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
+		        */
 		        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
 		    };
 		    static uint8_t phase = 5;
@@ -272,7 +276,7 @@ int main(void)
 				//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&kreps[phase], sizeof(struct kbd_report));
 				// RS send begin
 
-				const char message[] = "raport sent\r\n";
+				const char message[] = "main raport sent\r\n";
 				HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
 
 				// RS send end
@@ -284,7 +288,7 @@ int main(void)
 			else
 			{
 				// RS send begin
-				const char message[] = "raport not sent\r\n";
+				const char message[] = "main raport not sent\r\n";
 				HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
 				// RS send end
 			}
@@ -381,8 +385,12 @@ void baba(void)
     {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
+        {0, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
+        {0, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
+		/*
         {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
         {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
+        */
         {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
     };
     static uint8_t phase = 5;
@@ -402,7 +410,7 @@ void baba(void)
 		//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, uartBuffer, 4);
 		// RS send begin
 
-		const char message[] = "raport sent\r\n";
+		const char message[] = "baba raport sent\r\n";
 		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
 
 		// RS send end
@@ -414,7 +422,7 @@ void baba(void)
 	else
 	{
 		// RS send begin
-		const char message[] = "raport not sent\r\n";
+		const char message[] = "baba raport not sent\r\n";
 		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
 		// RS send end
 	}
