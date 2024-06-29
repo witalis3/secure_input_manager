@@ -934,29 +934,29 @@ uint8_t ps2_kbd_getkey(uint8_t * kbd_key)
         }
         if(ps2_kbd_s <= PS2_MAINKEYMAP_SIZE)
         {
-          if((state & ST_KBDALTGR) && keymap.uses_altgr) /* altgr */
-            ps2_kbd_c = keymap.altgr[ps2_kbd_s];
+          if((state & ST_KBDALTGR) && keymap_PS2.uses_altgr) /* altgr */
+            ps2_kbd_c = keymap_PS2.altgr[ps2_kbd_s];
           else if(state & (ST_KBDSHIFT_L | ST_KBDSHIFT_R))
           { /* shift */
             if(ps2_kbdlockstatus & ST_KBDCAPSLOCK)
-              ps2_kbd_c = keymap.shiftcaps[ps2_kbd_s];
+              ps2_kbd_c = keymap_PS2.shiftcaps[ps2_kbd_s];
             else
-              ps2_kbd_c = keymap.shift[ps2_kbd_s];
+              ps2_kbd_c = keymap_PS2.shift[ps2_kbd_s];
           }
           else
           {
             if(ps2_kbdlockstatus & ST_KBDCAPSLOCK)
-              ps2_kbd_c = keymap.noshiftcaps[ps2_kbd_s];
+              ps2_kbd_c = keymap_PS2.noshiftcaps[ps2_kbd_s];
             else
-              ps2_kbd_c = keymap.noshift[ps2_kbd_s];
+              ps2_kbd_c = keymap_PS2.noshift[ps2_kbd_s];
           }
         }
         else if(ps2_kbd_s <= (PS2_MAINKEYMAP_SIZE + PS2_NUMKEYMAP_SIZE))
         { /* numerikus */
           if(ps2_kbdlockstatus & ST_KBDNUMLOCK)
-            ps2_kbd_c = keymap.numon[ps2_kbd_s - PS2_MAINKEYMAP_SIZE];
+            ps2_kbd_c = keymap_PS2.numon[ps2_kbd_s - PS2_MAINKEYMAP_SIZE];
           else
-            ps2_kbd_c = keymap.numoff[ps2_kbd_s - PS2_MAINKEYMAP_SIZE];
+            ps2_kbd_c = keymap_PS2.numoff[ps2_kbd_s - PS2_MAINKEYMAP_SIZE];
         }
         if(kbd_key)
         {

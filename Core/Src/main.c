@@ -15,14 +15,24 @@
   *
   ******************************************************************************
   *
+  * USB HID from https://github.com/adzierzanowski/ps2-to-usb
+  * PS2 from https://github.com/RobertoBenjami/stm32_ps2
+  * KeyPad from ...
   * ToDo
+  * - wysyłanie do kolejki ->
+  * 	- nie wysyła puszczenia klawisza?
+  * 		- queue_elem_t jest 16 bit!
+  * 	- usunąć duplikat kolejki
+  * 	- porównać z Dzierżanowskim
+  *
+  * - nie zrobione! reverse keymap: znak -> kod PS2 (tabela) i do put...
   * - jak wysłać raport na HID klawiatury?
   * 	- extern device w main -> działa 2 wariant raportu (bez FS)
   * 	- extern bez static w ...
   * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
   * 	- w systick Callback
   * 		- uruchomić debugger: czy wchodzi w systick callback?
-  * 		- czy jest obsługa uzsart?
+  * 		- czy jest obsługa usart?
   * 		- wysyłać ew zmianę na PINie
   *
   * 	- zrobiony! OLED
@@ -62,9 +72,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-// custom HID keyboard
+// custom HID keyboard CubeMX
 #include "usbd_customhid.h"
 #include "usbd_custom_hid_if.h"
+// USB HID keyboard
+#include "keyboard.h"
+#include "queue.h"
 
 /* USER CODE END Includes */
 
@@ -92,6 +105,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+// USB HID keyboard begin
+struct queue_t keyq = {0};
+//struct queue_t *keyqWsk;
+struct keyboard_hid_t khid = {0};
+uint32_t keyq_timeout = 0;
+// USB HID keyboard end
+
 // OLED begin:
 const uint8_t SSD1306_ADDRESS = 0x3C << 1;
 const uint8_t RANDOM_REG = 0x0F;
@@ -141,15 +161,7 @@ struct kbd_report {
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
-	// test HID
-	uint8_t i;
-	uint8_t hid_test[64];
-	for (i = 0; i<64; i++)
-	{
-		hid_test[i] = i;
-	}
 	// KeyPad begin
 	KeyPad_Init();
 	// KeyPad end
@@ -187,6 +199,9 @@ int main(void)
 	ssd1306_WriteString("Manager started.", Font_7x10, White);
 	ssd1306_UpdateScreen();
 	// OLED end
+	  // USB HID keyboard begin
+	  queue_init(&keyq);
+	  // USB HID keyboard end
 
   /* USER CODE END 2 */
 
@@ -194,7 +209,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	// keybord PS2 begin
 	uint8_t ch;
-	//ToDo nie działa printf wzięty z biblioteki PS2
+	//ToDo !nie działa!!! printf wzięty z biblioteki PS2
 	printf("\r\nControl start\r\n");
 	// keyboard PS2 end
 	// RS send begin
@@ -203,31 +218,22 @@ int main(void)
 	// RS send end
   while (1)
   {
-	// keybord PS2 begin
 	/* here we simulate the time of other activities in the program loop */
-	HAL_Delay(30);
+	  // USB HID keyboard begin
+	  HAL_Delay(50);
+	  handle_keys(&hUsbDeviceFS, &khid, &keyq, keyq_timeout, &hi2c1);
+	  // USB HID keyboard end
 
-	// HID test
-	HAL_Delay(1000);
-	USBD_CUSTOM_HID_SendReport_FS(hid_test, 64);
-
-	/* get keyboard */
+	/* get keyboard PS2 na ekran OLED begin*/
 	while(ps2_kbd_getkey(&ch) == 1)
 	{ /* recevied keyboard data */
-		/*
-	  if(ch >= 32)
-		printf("Kbd: '%c', 0x%X\r\n", ch, ch);
-	  else
-		printf("Kbd:       0x%X\r\n", ch);
-		*/
 		ssd1306_Init();
 		ssd1306_Fill(Black);
 		ssd1306_SetCursor(0,26);
 		ssd1306_WriteChar(ch, Font_11x18, White);
 		ssd1306_UpdateScreen();
-
 	}
-	// keyboard PS2 end
+	// get keyboard PS2 na ekran OLED end
 
     /* USER CODE END WHILE */
 
@@ -237,63 +243,18 @@ int main(void)
 		 char znak = KeyPad_WaitForKeyGetChar(timeout);
 		 if (znak != 'X')
 		 {
-			  	ssd1306_Init();
-			    ssd1306_Fill(Black);
-			    ssd1306_SetCursor(0,26);
-			    //char c = znak;
-			    char str1[2] = {znak , '\0'};
-				ssd1306_WriteString(str1, Font_11x18, White);
-				ssd1306_UpdateScreen();
-
+			ssd1306_Init();
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(0,26);
+			//char c = znak;
+			queue_elem_t ele = 0x001c;
+			queue_put(&keyq, ele);
+			//queue_put(&keyq, 0x1d);
+			char str1[2] = {znak , '\0'};
+			ssd1306_WriteString(str1, Font_11x18, White);
+			ssd1306_UpdateScreen();
 		 }
 		 // KeyPad end
-		 // baba:
-		    static const struct kbd_report kreps[5] =
-		    {
-		        {0, 0, 0, 0, 0, 0, 0, 0},
-		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
-		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
-		        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
-				/*
-		        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
-		        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
-		        */
-		        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
-		    };
-		    static uint8_t phase = 5;
-		    static uint8_t khist;
-		    static uint8_t tdiv;
-		    ++ tdiv;
-		    if ( (tdiv % 10 == 0) && (phase == 5) && ((khist = (khist << 1 | BTN_DOWN) & 3) == 1) )
-			{
-				phase = 0;
-			}
-			if (tdiv == 100)
-			{
-
-				tdiv = 0;
-				USBD_CUSTOM_HID_SendReport_FS((uint8_t*)&kreps[phase], sizeof(struct kbd_report));
-				//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&kreps[phase], sizeof(struct kbd_report));
-				// RS send begin
-
-				const char message[] = "main raport sent\r\n";
-				HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
-
-				// RS send end
-				if (phase < 5)
-				{
-					++phase;
-				}
-			}
-			else
-			{
-				// RS send begin
-				const char message[] = "main raport not sent\r\n";
-				HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
-				// RS send end
-			}
-			// end baba
-		 //HAL_Delay(1);
   }
   /* USER CODE END 3 */
 }
@@ -378,54 +339,6 @@ void Error_Handler(void)
   {
   }
   /* USER CODE END Error_Handler_Debug */
-}
-void baba(void)
-{
-    static const struct kbd_report kreps[5] =
-    {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, KEY_LET('A'), 0, 0, 0, 0, 0},
-        {0, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
-        {0, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
-		/*
-        {KEY_MOD_LSHIFT, 0, KEY_LET('B'), 0, 0, 0, 0, 0},
-        {KEY_MOD_RALT, 0, KEY_LET('C'), 0, 0, 0, 0, 0},
-        */
-        {0, 0, KEY_CAPSLOCK, 0, 0, 0, 0, 0}
-    };
-    static uint8_t phase = 5;
-    static uint8_t khist;
-    static uint8_t tdiv;
-    ++ tdiv;
-    if ( (tdiv % 10 == 0) && (phase == 5) && ((khist = (khist << 1 | BTN_DOWN) & 3) == 1) )
-	{
-		phase = 0;
-	}
-	if (tdiv == 100)
-	{
-
-		tdiv = 0;
-		USBD_CUSTOM_HID_SendReport_FS((uint8_t*)&kreps[phase], sizeof(struct kbd_report));
-		//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&kreps[phase], sizeof(struct kbd_report));
-		//USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, uartBuffer, 4);
-		// RS send begin
-
-		const char message[] = "baba raport sent\r\n";
-		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
-
-		// RS send end
-		if (phase < 5)
-		{
-			++phase;
-		}
-	}
-	else
-	{
-		// RS send begin
-		const char message[] = "baba raport not sent\r\n";
-		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
-		// RS send end
-	}
 }
 
 #ifdef  USE_FULL_ASSERT

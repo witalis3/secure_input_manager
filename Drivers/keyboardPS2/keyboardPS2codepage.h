@@ -22,7 +22,7 @@ typedef struct {
 } PS2Keymap_t;
 
 #ifdef KEYMAP_US
-const PS2Keymap_t keymap = {
+const PS2Keymap_t keymap_PS2 = {
   // noshift
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
   0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '`', 0,
@@ -95,7 +95,7 @@ const PS2Keymap_t keymap = {
 #endif
 
 #ifdef KEYMAP_HU
-const PS2Keymap_t keymap = {
+const PS2Keymap_t keymap_PS2 = {
   // noshift
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
   0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '0', 0,
@@ -105,25 +105,25 @@ const PS2Keymap_t keymap = {
   0, ' ', 'v', 'f', 't', 'r', '5', 0,
   0, 'n', 'b', 'h', 'g', 'z', '6', 0,
   0, 0, 'm', 'j', 'u', '7', '8', 0,
-  0, ',', 'k', 'i', 'o', 'ö', '9', 0,
-  0, '.', '-', 'l', 'é', 'p', 'ü', 0,
-  0, 0, 'á', 0, 'õ', 'ó', 0, 0,
-  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ú', 0, '\\', 0, 0,
-  0, 'í', 0, 0, 0, 0, PS2_BACKSPACE, 0},
+  0, ',', 'k', 'i', 'o', 'ï¿½', '9', 0,
+  0, '.', '-', 'l', 'ï¿½', 'p', 'ï¿½', 0,
+  0, 0, 'ï¿½', 0, 'ï¿½', 'ï¿½', 0, 0,
+  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ï¿½', 0, '\\', 0, 0,
+  0, 'ï¿½', 0, 0, 0, 0, PS2_BACKSPACE, 0},
   // shift
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
-  0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '§', 0,
+  0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 'ï¿½', 0,
   0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'Q', '\'', 0,
   0, 0, 'Y', 'S', 'A', 'W', '\"', 0,
   0, 'C', 'X', 'D', 'E', '!', '+', 0,
   0, ' ', 'V', 'F', 'T', 'R', '%', 0,
   0, 'N', 'B', 'H', 'G', 'Z', '/', 0,
   0, 0, 'M', 'J', 'U', '=', '(', 0,
-  0, '?', 'K', 'I', 'O', 'Ö', ')', 0,
-  0, ':', '_', 'L', 'É', 'P', 'Ü', 0,
-  0, 0, 'Á', 0, 'Õ', 'Ó', 0, 0,
-  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'Ú', 0, '|', 0, 0,
-  0, 'Í', 0, 0, 0, 0, PS2_BACKSPACE, 0},
+  0, '?', 'K', 'I', 'O', 'ï¿½', ')', 0,
+  0, ':', '_', 'L', 'ï¿½', 'P', 'ï¿½', 0,
+  0, 0, 'ï¿½', 0, 'ï¿½', 'ï¿½', 0, 0,
+  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ï¿½', 0, '|', 0, 0,
+  0, 'ï¿½', 0, 0, 0, 0, PS2_BACKSPACE, 0},
   // noshiftcaps
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
   0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '0', 0,
@@ -133,25 +133,25 @@ const PS2Keymap_t keymap = {
   0, ' ', 'V', 'F', 'T', 'R', '5', 0,
   0, 'N', 'B', 'H', 'G', 'Z', '6', 0,
   0, 0, 'M', 'J', 'U', '7', '8', 0,
-  0, ',', 'K', 'I', 'O', 'Ö', '9', 0,
-  0, '.', '-', 'L', 'É', 'P', 'Ü', 0,
-  0, 0, 'Á', 0, 'Õ', 'Ó', 0, 0,
-  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'Ú', 0, '\\', 0, 0,
-  0, 'Í', 0, 0, 0, 0, PS2_BACKSPACE, 0},
+  0, ',', 'K', 'I', 'O', 'ï¿½', '9', 0,
+  0, '.', '-', 'L', 'ï¿½', 'P', 'ï¿½', 0,
+  0, 0, 'ï¿½', 0, 'ï¿½', 'ï¿½', 0, 0,
+  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ï¿½', 0, '\\', 0, 0,
+  0, 'ï¿½', 0, 0, 0, 0, PS2_BACKSPACE, 0},
   // shiftcaps
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
-  0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '§', 0,
+  0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 'ï¿½', 0,
   0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'q', '\'', 0,
   0, 0, 'y', 's', 'a', 'w', '\"', 0,
   0, 'c', 'x', 'd', 'e', '!', '+', 0,
   0, ' ', 'v', 'f', 't', 'r', '%', 0,
   0, 'n', 'b', 'h', 'g', 'z', '/', 0,
   0, 0, 'm', 'j', 'u', '=', '(', 0,
-  0, '?', 'k', 'i', 'o', 'ö', ')', 0,
-  0, ':', '_', 'l', 'é', 'p', 'ü', 0,
-  0, 0, 'á', 0, 'õ', 'ó', 0, 0,
-  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ú', 0, '|', 0, 0,
-  0, 'í', 0, 0, 0, 0, PS2_BACKSPACE, 0},
+  0, '?', 'k', 'i', 'o', 'ï¿½', ')', 0,
+  0, ':', '_', 'l', 'ï¿½', 'p', 'ï¿½', 0,
+  0, 0, 'ï¿½', 0, 'ï¿½', 'ï¿½', 0, 0,
+  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ï¿½', 0, '|', 0, 0,
+  0, 'ï¿½', 0, 0, 0, 0, PS2_BACKSPACE, 0},
   // numoff
   {0, PS2_END, 0, PS2_LEFTARROW, PS2_HOME, 0, 0, 0,
   PS2_INSERT, PS2_DELETE, PS2_DOWNARROW, 0, PS2_LEFTARROW, PS2_UPARROW, PS2_ESC, 0 /*NumLock*/,
@@ -168,21 +168,21 @@ const PS2Keymap_t keymap = {
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
   0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '0', 0,
   0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, '\\', '~', 0,
-  0, 0, '>', 'ð', 'ä', '|', '¡', 0,
-  0, '&', '#', 'Ð', 'Ä', '¢', '^', 0,
-  0, ' ', '@', '[', 't', 'r', '°', 0,
-  0, '}', '{', 'h', ']', 'z', '²', 0,
-  0, 0, 'm', 'j', '€', '`', 'ÿ', 0,
-  0, ';', '³', 'i', 'o', '½', '´', 0,
-  0, '.', '*', '£', '$', 'p', '¨', 0,
-  0, 0, 'ß', 0, '÷', '¸', 0, 0,
-  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ú', 0, '\\', 0, 0,
+  0, 0, '>', 'ï¿½', 'ï¿½', '|', 'ï¿½', 0,
+  0, '&', '#', 'ï¿½', 'ï¿½', 'ï¿½', '^', 0,
+  0, ' ', '@', '[', 't', 'r', 'ï¿½', 0,
+  0, '}', '{', 'h', ']', 'z', 'ï¿½', 0,
+  0, 0, 'm', 'j', 'ï¿½', '`', 'ï¿½', 0,
+  0, ';', 'ï¿½', 'i', 'o', 'ï¿½', 'ï¿½', 0,
+  0, '.', '*', 'ï¿½', '$', 'p', 'ï¿½', 0,
+  0, 0, 'ï¿½', 0, 'ï¿½', 'ï¿½', 0, 0,
+  0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, 'ï¿½', 0, '\\', 0, 0,
   0, '<', 0, 0, 0, 0, PS2_BACKSPACE, 0}
 };
 #endif
 
 #ifdef KEYMAP_D
-const PS2Keymap_t keymap = {
+const PS2Keymap_t keymap_PS2 = {
   // without shift
   {0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
   0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '^', 0,
