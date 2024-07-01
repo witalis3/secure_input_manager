@@ -19,6 +19,9 @@
   * PS2 from https://github.com/RobertoBenjami/stm32_ps2
   * KeyPad from ...
   * ToDo
+  *  - wysyłanie zera jako puszczenie klawisza 20240701
+  *  	- to jest w projekcie STM32...
+  *
   * - wysyłanie do kolejki ->
   * 	- nie wysyła puszczenia klawisza?
   * 		- queue_elem_t jest 16 bit!
