@@ -16,17 +16,21 @@
   ******************************************************************************
   *
   * USB HID from https://github.com/adzierzanowski/ps2-to-usb
-  * PS2 from https://github.com/RobertoBenjami/stm32_ps2
+  * PS2 from https://github.com/RobertoBenjami/stm32_ps2; ręcznie ustawiane przerwania i pewnie nie tylko
   * KeyPad from ...
   * ToDo
+  * - wyczyśić kod z kolejki itd. PS2 dzierżanowskiego; potrzebna jest tylko inicjalizacja HIDu
+  * - jak zorganizować wysyłkę znaków poprzez HID (potrzebne są ostępy czasowe pomiędzy wysłaniem znaku a bajtu zerowego)
+  * - 20240712
+  * 	- po wysłaniu znaku musi być czas jakiś (50ms działa) przed wysłaniem bajtu zerowego (puszczenie klawisza)
+  * 		- przerwania?
+  * 	- wysyłanie w STM było "SEND_REPORT_HID" a u nas SEND_REPORT_CUSTOM_HID
+  * 	-
   *  - wysyłanie zera jako puszczenie klawisza 20240701
   *  	- to jest w projekcie STM32...
   *
-  * - wysyłanie do kolejki ->
+  * - wysyłanie do kolejki -> kolejka nas już nie interesuje
   * 	- nie wysyła puszczenia klawisza?
-  * 		- queue_elem_t jest 16 bit!
-  * 	- usunąć duplikat kolejki
-  * 	- porównać z Dzierżanowskim
   *
   * - nie zrobione! reverse keymap: znak -> kod PS2 (tabela) i do put...
   * - jak wysłać raport na HID klawiatury?
@@ -224,7 +228,7 @@ int main(void)
 	/* here we simulate the time of other activities in the program loop */
 	  // USB HID keyboard begin
 	  HAL_Delay(50);
-	  handle_keys(&hUsbDeviceFS, &khid, &keyq, keyq_timeout, &hi2c1);
+	  //handle_keys(&hUsbDeviceFS, &khid, &keyq, keyq_timeout, &hi2c1);
 	  // USB HID keyboard end
 
 	/* get keyboard PS2 na ekran OLED begin*/
@@ -249,10 +253,39 @@ int main(void)
 			ssd1306_Init();
 			ssd1306_Fill(Black);
 			ssd1306_SetCursor(0,26);
+/* wysyłanie znaku na HID
+ *
+ */
+		      uint8_t zwrot = 0;
+		      struct keyboard_hid_t *khid0;
+		      khid0->modifiers = 0;
+		      khid0->reserved = 0;
+		      khid0->keys[0] = 0x45;
+		      khid0->keys[1] = 0;
+		      khid0->keys[2] = 0;
+		      khid0->keys[3] = 0;
+		      khid0->keys[4] = 0;
+		      khid0->keys[5] = 0;
+		      zwrot = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t *) khid0, KHIDSZ);
+		      HAL_Delay(50);
+		      khid0->modifiers = 0;
+		      khid0->reserved = 0;
+		      khid0->keys[0] = 0;
+		      khid0->keys[1] = 0;
+		      khid0->keys[2] = 0;
+		      khid0->keys[3] = 0;
+		      khid0->keys[4] = 0;
+		      khid0->keys[5] = 0;
+		      zwrot = USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, (uint8_t *) khid0, KHIDSZ);
+
+			/*
+			 * wysyłanie przez kolejkę; nieudana!
+			 *
 			//char c = znak;
 			queue_elem_t ele = 0x001c;
 			queue_put(&keyq, ele);
 			//queue_put(&keyq, 0x1d);
+			*/
 			char str1[2] = {znak , '\0'};
 			ssd1306_WriteString(str1, Font_11x18, White);
 			ssd1306_UpdateScreen();
