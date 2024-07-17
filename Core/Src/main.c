@@ -17,31 +17,29 @@
   *
   * USB HID from https://github.com/adzierzanowski/ps2-to-usb
   * PS2 from https://github.com/RobertoBenjami/stm32_ps2; ręcznie ustawiane przerwania i pewnie nie tylko
-  * KeyPad from ...
+  * KeyPad from https://github.com/nimaltd/KeyPad
+  * driver OLED from https://github.com/KoenGilissen/STM32F432KC_SSD1306_I2C_driver/tree/master
+  *
   * ToDo
-  * - wyczyścić kod z kolejki itd. PS2 dzierżanowskiego; potrzebna jest tylko inicjalizacja HIDu
+  * - elementy do stika:
+  * 	- STM32G0B1 32 nogi + USB
+  * 		- https://www.mouser.pl/ProductDetail/STMicroelectronics/STM32G0B1KEU6N?qs=CiayqK2gdcJs2wGa9bJzjQ%3D%3D
+  * 			- 5x5x055mm obudowa UFQFPN
+  * 	- stab 3,6V
+  * 	- rezonator? mini
+  * 	- OLED 32x12mm 128x64 0,91 cala
+  * 	- gniazdo kartu SD mini krótka
+  * 		- https://www.tme.eu/pl/details/mem2085/zlacza-do-kart/global-connector-technology-gct/mem2085-00-115-00-a/
+  * 			- super małe
+  * 	- tacty https://www.tme.eu/pl/details/b3u-3100pm-b/mikroprzelaczniki-tact/omron-electronic-components/
+  *
   * - jak zorganizować wysyłkę znaków poprzez HID (potrzebne są ostępy czasowe pomiędzy wysłaniem znaku a bajtu zerowego)
   * - 20240712
   * 	- po wysłaniu znaku musi być czas jakiś (50ms działa) przed wysłaniem bajtu zerowego (puszczenie klawisza)
   * 		- przerwania?
   * 	- wysyłanie w STM było "SEND_REPORT_HID" a u nas SEND_REPORT_CUSTOM_HID
   * 	-
-  *  - wysyłanie zera jako puszczenie klawisza 20240701
-  *  	- to jest w projekcie STM32...
-  *
-  * - wysyłanie do kolejki -> kolejka nas już nie interesuje
-  * 	- nie wysyła puszczenia klawisza?
-  *
-  * - nie zrobione! reverse keymap: znak -> kod PS2 (tabela) i do put...
-  * - jak wysłać raport na HID klawiatury?
-  * 	- extern device w main -> działa 2 wariant raportu (bez FS)
-  * 	- extern bez static w ...
   * - dodanie peryferiów i uruchomienie (plus wyczyszczenie kodu)
-  * 	- w systick Callback
-  * 		- uruchomić debugger: czy wchodzi w systick callback?
-  * 		- czy jest obsługa usart?
-  * 		- wysyłać ew zmianę na PINie
-  *
   * 	- zrobiony! OLED
   * 	- zrobiony! KeyPad
   * 	- zrobiony! RS232 huart2
@@ -50,11 +48,8 @@
   * 		- usunięcie obsługi myszy
   * 	- USB keyboard
   * 		- custom HID
-  * 			- report...kbd_report
+  * 		- !zrobione inicjalizacja keyboard HID: https://github.com/adzierzanowski/ps2-to-usb
   * 			- port i pin LED
-  * - sprawdzić rolę Timer2 - czy jest potrzebny
-  * - sprawdzić, czy jest IP DMA (ustawienia USB OTG w MX)potrzebne
-  * - nastąpiła zmiana opisów kolumn KeyPada
   *
   ******************************************************************************
   */
@@ -84,7 +79,6 @@
 #include "usbd_custom_hid_if.h"
 // USB HID keyboard
 #include "keyboard.h"
-#include "queue.h"
 
 /* USER CODE END Includes */
 
@@ -113,10 +107,7 @@
 
 /* USER CODE BEGIN PV */
 // USB HID keyboard begin
-struct queue_t keyq = {0};
-//struct queue_t *keyqWsk;
 struct keyboard_hid_t khid = {0};
-uint32_t keyq_timeout = 0;
 // USB HID keyboard end
 
 // OLED begin:
@@ -138,27 +129,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define KEY_MOD_LCTRL  	0x01
-#define KEY_MOD_LSHIFT 	0x02
-#define KEY_MOD_LALT   	0x04
-#define KEY_MOD_LMETA  	0x08
-#define KEY_MOD_RCTRL  	0x10
-#define KEY_MOD_RSHIFT 	0x20
-#define KEY_MOD_RALT   	0x40
-#define KEY_MOD_RMETA  	0x80
-#define KEY_CAPSLOCK 	0x39
-#define KEY_LET(v)		(v - 'A' + 4) // A key - code 4
-
-// ToDo poprawić
-#define BTN_DOWN 1
-
-struct kbd_report {
-    uint8_t modifier;
-    uint8_t reserved;
-    uint8_t key[6];
-};
-
-
 
 /* USER CODE END 0 */
 
@@ -206,10 +176,6 @@ int main(void)
 	ssd1306_WriteString("Manager started.", Font_7x10, White);
 	ssd1306_UpdateScreen();
 	// OLED end
-	  // USB HID keyboard begin
-	  queue_init(&keyq);
-	  // USB HID keyboard end
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
