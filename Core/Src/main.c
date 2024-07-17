@@ -19,7 +19,7 @@
   * PS2 from https://github.com/RobertoBenjami/stm32_ps2; ręcznie ustawiane przerwania i pewnie nie tylko
   * KeyPad from ...
   * ToDo
-  * - wyczyśić kod z kolejki itd. PS2 dzierżanowskiego; potrzebna jest tylko inicjalizacja HIDu
+  * - wyczyścić kod z kolejki itd. PS2 dzierżanowskiego; potrzebna jest tylko inicjalizacja HIDu
   * - jak zorganizować wysyłkę znaków poprzez HID (potrzebne są ostępy czasowe pomiędzy wysłaniem znaku a bajtu zerowego)
   * - 20240712
   * 	- po wysłaniu znaku musi być czas jakiś (50ms działa) przed wysłaniem bajtu zerowego (puszczenie klawisza)
@@ -227,7 +227,7 @@ int main(void)
   {
 	/* here we simulate the time of other activities in the program loop */
 	  // USB HID keyboard begin
-	  HAL_Delay(50);
+	  //HAL_Delay(50);
 	  //handle_keys(&hUsbDeviceFS, &khid, &keyq, keyq_timeout, &hi2c1);
 	  // USB HID keyboard end
 
@@ -260,7 +260,7 @@ int main(void)
 		      struct keyboard_hid_t *khid0;
 		      khid0->modifiers = 0;
 		      khid0->reserved = 0;
-		      khid0->keys[0] = 0x45;
+		      khid0->keys[0] = 0x04;	// 0x45 F12; 0x04 "a"
 		      khid0->keys[1] = 0;
 		      khid0->keys[2] = 0;
 		      khid0->keys[3] = 0;
